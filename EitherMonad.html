@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>reveal.js</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/sky.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/atom-one-dark.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h3>Why do you use GOTO?</h3>
+				<p>Now, you thought: "What? I didn't!"</p>
+				<p>And go to write:</p>
+				<pre><code class="hljs-code language-csharp" data-trim>
+					throw new Exception(message);
+				</code></pre>
+			</section>
+			<section>
+				Is throwing an exception a kind of goto?
+				<p>Yes, because it let you <span style="background-color: cornsilk;">BREAK THE FLOW</span></p>
+				<p>with goto:</p>
+				<pre><code class="hljs-code language-csharp" data-trim>
+					for (...) {
+						for (...) {
+							for (...) {
+							...
+								if (something)
+									goto END_OF_LOOP;
+							}
+						}
+					}					
+					END_OF_LOOP:
+				</code></pre>
+
+			</section>
+			<section>
+				<p>The same with exception</p>
+				<pre><code class="hljs-code language-csharp" data-trim>	
+					try
+					{
+						for (...) {
+							for (...) {
+								for (...) {
+								...
+									if (something)
+										throw new Exception();
+								}
+							}
+						}				
+					}
+					catch (Exception)
+					{
+					}
+				</code></pre>
+				<p>It's painful, but worked. And it's valid C# code.</p>
+			</section>
+			<section>
+				<h3>What should we do?</h3>
+				<p>Use the superpower of MONAD!</p>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>
