@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>reveal.js</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h2>
+					<pre><code class="hljs-code language-csharp" data-trim>
+						T Generic&lt;T&gt;() // what is type of T ?
+					</code></pre>
+				</h2>
+				<p>So, let's say we have generic method</p>
+				<pre><code class="hljs-code" data-trim>
+					string Method&lt;T&gt;()
+					{
+						...
+					}
+				</code></pre>
+				<p>and some custom types</p>
+
+				<pre><code data-trim data-noescape >
+					class Foo {}
+					class Bar {}
+				</code></pre>
+			</section>
+			<section>
+				<p>And now we need separate logic for each type:</p>
+				<pre><code class="hljs-code language-csharp" data-trim>
+					string Method&lt;T&gt;()
+					{
+						if (typeof(T) == typeof(Foo)) 
+						{
+								return ... // build string for Foo context
+						}
+						if (typeof(T) == typeof(Bar)) 
+						{
+								return ... // build string for Bar context
+						}
+						throw new Exception("(╯°□°）╯︵ ┻━┻");
+					}
+				</code></pre>
+				<p>Good! It works. But...</p>
+				<p>What if the number of types would be greater than N? </p>
+			</section>
+
+			<section>
+				<p>Then it looks like a code smells</p>
+				<pre><code class="hljs-code language-csharp" data-trim>
+				
+						if (typeof(T) == typeof(Foo)) 
+						{
+							return ... // build string for Foo context
+						}	
+						if (typeof(T) == typeof(Bar)) 
+						{
+							return ... // build string for Bar context
+						}						
+						if (typeof(T) == typeof(...)) 
+						{			...			}
+						if (typeof(T) == typeof(...)) 
+						{			...			} 
+						// etc...
+				</code></pre>
+			</section>
+
+			<section>
+				<p>You'll think: "but we have SWITCH EXPRESSIONS!"</p>
+				<p>And, maybe, you'll try to write something like this:</p>
+				<pre><code class="hljs-code language-csharp" data-trim>
+					return typeof(T) switch
+					{
+							typeof(Foo) => ... // build string for Foo context,
+							typeof(Bar) => ... // build string for Bar context,
+							typeof(...) => ... 
+							typeof(...) => ... //
+							typeof(...) => ... //
+							_ => throw new Exception("(╯°□°）╯︵ ┻━┻")
+					};
+				</code></pre>
+				<p>Look nice. But it doesn't work.</p>
+				<code style="background-color: red;">CS0150:A constant value is expected (3:5)</code>
+			</section>
+
+			<section>
+				<p>So what to do?</p>
+				<p>Well, you can use a trcik</p>
+
+				<pre><code class="hljs-code language-csharp" data-trim>
+					struct A&lt;T&gt;
+					{
+							public static A&lt;T&gt; Is => default;
+					}
+				</code></pre>
+				<p>Look at new version of switch:</p>
+				<pre><code class="hljs-code language-csharp" data-trim>
+					return A&lt;T&gt;.Is switch
+					{
+							A&lt;Foo&gt; => ... // build string for Foo context,
+							A&lt;Bar&gt; => ... // build string for Bar context,
+							A&lt;...&gt; => ... //
+							A&lt;...&gt; => ... //
+							A&lt;...&gt; => ... //
+							_ => throw new Exception("(╯°□°）╯︵ ┻━┻")
+					};
+				</code></pre>
+			</section>
+
+			<section>
+				<p> Ok. Cool. </p>
+				<p>And what if we need to save "typechek" to bool ?</p>
+				<p>Add method:</p>
+				<pre><code class="hljs-code language-csharp" data-line-numbers="4" data-trim>
+					struct A&lt;T&gt;
+					{
+							public static A&lt;T&gt; Is => default;							
+							public static bool IsEqual&lt;U&gt;() => Is is A&lt;U&gt;;
+					}
+				</code></pre>
+				<p>How to use it:</p>
+				<pre><code class="hljs-code language-csharp" data-trim>
+					bool isFoo = A&lt;T&gt;.IsEqual&lt;Foo&gt;();
+				</code></pre>
+			</section>
+
+			<section>
+				<p>You can change names of struct or its members :) </p>
+				<p>Good luck and thanks for your attention!</p>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>
